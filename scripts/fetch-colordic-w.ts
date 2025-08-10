@@ -72,7 +72,7 @@ async function main() {
   const withHsl = colors.map(c => {
     const { r, g, b } = hexToRgb(c.hex)
     const { h, s, l } = rgbToHsl(r, g, b)
-    return { ...c, h, s, l }
+    return { ...c, hsl: [h, s, l] as [number, number, number] }
   })
   const outFile = path.join(dataDir, '和色大辞典.json')
   await fs.writeFile(outFile, JSON.stringify(withHsl, null, 2) + '\n', 'utf8')
