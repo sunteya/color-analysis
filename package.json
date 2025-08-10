@@ -1,6 +1,4 @@
 {
-  "name": "kk",
-  "version": "0.0.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,13 +6,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
+    "build": "vite build",
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "@floating-ui/vue": "^1.1.8",
+    "@floating-ui/vue": "1.1.8",
     "tailwindcss": "4.1.11",
     "vue": "3.5.18",
     "vue-router": "4.5.1"

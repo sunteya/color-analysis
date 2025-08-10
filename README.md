@@ -1,33 +1,39 @@
-# .
+# Color Analysis
 
-This template should help get you started developing with Vue 3 in Vite.
+Interactive hue–luminance scatter plot of curated color dictionaries (Japanese 和色, Western 洋色, and Chinese 中国色).
 
-## Recommended IDE Setup
+## Homepage
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Live demo: https://sunteya.github.io/color-analysis/
 
-## Type Support for `.vue` Imports in TS
+## What it does
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Visualizes colors on a 2D plot: horizontal axis is hue (H), vertical axis is lightness (L)
+- Switch between datasets (JP/YO/CN)
+- Drag or scroll to rotate/pan hue alignment
+- Hover to see name and HEX; click a dot to copy HEX
+- Input a custom HEX (e.g. `#409EFF`) to locate it on the plot
+- Adjustable horizontal guide lines for quick comparisons
 
-## Customize configuration
+## Tech stack
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Vue 3 + Vite + TypeScript
+- Tailwind CSS for styling
+- Small utilities for color conversions (RGB ↔ HSL)
 
-## Project Setup
+## Development
 
 ```sh
 pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## Build
 
 ```sh
 pnpm build
 ```
+
+## License
+
+MIT

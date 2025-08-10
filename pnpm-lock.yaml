@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@floating-ui/vue':
-        specifier: ^1.1.8
+        specifier: 1.1.8
         version: 1.1.8(vue@3.5.18(typescript@5.8.3))
       tailwindcss:
         specifier: 4.1.11
