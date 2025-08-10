@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import rawJP from '../../data/和色大辞典.json'
 import rawYO from '../../data/洋色大辞典.json'
-import rawCN from '../../data/中国传统颜色.json'
+import rawCN from '../../data/中国传统色.json'
 import ColorPoint from '~/components/ColorPoint.vue'
 import GuideLine from '~/components/GuideLine.vue'
 import { ref, computed, onBeforeUnmount } from 'vue'
@@ -14,7 +14,7 @@ type Point = Base & { x: number; y: number }
 const tabs = [
   { key: 'jp', label: '和色大辞典', data: rawJP as RawColor[] },
   { key: 'yo', label: '洋色大辞典', data: rawYO as RawColor[] },
-  { key: 'cn', label: '中国传统颜色', data: rawCN as RawColor[] },
+  { key: 'cn', label: '中国传统色', data: rawCN as RawColor[] },
 ]
 
 const currentTab = ref<'jp' | 'yo' | 'cn'>('jp')

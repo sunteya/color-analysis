@@ -2,11 +2,13 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { hexToRgb, rgbToHsl } from '../src/lib/utils'
+import YAML from 'yaml'
+import { execFile } from 'child_process'
+import { promisify } from 'util'
 
-type TradColor = {
-  name: string
-  hex: string
-}
+const execFileAsync = promisify(execFile)
+
+type CNColor = { name: string; hex: string }
 
 async function ensureDir(dirPath: string) {
   await fs.mkdir(dirPath, { recursive: true })
@@ -25,42 +27,40 @@ async function downloadIfNeeded(url: string, destFile: string) {
   if (await fileExists(destFile)) return
   const res = await fetch(url, { headers: { 'user-agent': 'color-analysis/1.0' } })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  const html = await res.text()
-  await fs.writeFile(destFile, html, 'utf8')
+  const txt = await res.text()
+  await fs.writeFile(destFile, txt, 'utf8')
 }
 
-function parseColorsFromHtml(html: string): TradColor[] {
-  const doc = html
-  const colorArticles = doc.match(/<article id="[^"]+">[\s\S]*?<\/article>/g) || []
-  const results: TradColor[] = []
-
-  for (const block of colorArticles) {
-    const nameMatch = block.match(/<h1>([^<]+)<\/h1>/)
-    const hexMatch = block.match(/<p>\s*(#[0-9A-Fa-f]{6})\s*<\/p>/)
-    if (nameMatch && hexMatch) {
-      results.push({ name: nameMatch[1], hex: hexMatch[1].toLowerCase() })
+function parseColorsFromYaml(yamlText: string): CNColor[] {
+  const doc = YAML.parse(yamlText) as Array<{ name?: string; hex?: string }> | null
+  if (!Array.isArray(doc)) return []
+  const results: CNColor[] = []
+  for (const item of doc) {
+    if (!item) continue
+    const name = item.name
+    const hex = item.hex
+    if (typeof name === 'string' && typeof hex === 'string' && /^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      results.push({ name, hex: hex.toLowerCase() })
     }
   }
-
-  // De-duplicate by hex preserving the first occurrence
-  const uniq = new Map<string, TradColor>()
+  const uniq = new Map<string, CNColor>()
   for (const c of results) if (!uniq.has(c.hex)) uniq.set(c.hex, c)
   return Array.from(uniq.values())
 }
 
 async function main() {
-  const URL = 'https://boxingp.github.io/traditional-chinese-colors/'
+  const URL = 'https://raw.githubusercontent.com/imoyao/GUSCSS/refs/heads/master/_data/colors.yml'
   const cwd = process.cwd()
   const tmpDir = path.resolve(cwd, 'tmp')
   const dataDir = path.resolve(cwd, 'data')
   await ensureDir(tmpDir)
   await ensureDir(dataDir)
 
-  const tmpFile = path.join(tmpDir, 'traditional-chinese-colors.html')
+  const tmpFile = path.join(tmpDir, 'guscss-colors.yml')
   await downloadIfNeeded(URL, tmpFile)
 
-  const html = await fs.readFile(tmpFile, 'utf8')
-  const colors = parseColorsFromHtml(html)
+  const yaml = await fs.readFile(tmpFile, 'utf8')
+  const colors = parseColorsFromYaml(yaml)
   const withHsl = colors.map(c => {
     const { r, g, b } = hexToRgb(c.hex)
     const { h, s, l } = rgbToHsl(r, g, b)
