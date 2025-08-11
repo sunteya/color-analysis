@@ -26,7 +26,8 @@ const { x, y, strategy } = useFloating(referenceRef, floatingRef, {
 })
 
 function onClick() {
-  navigator.clipboard?.writeText(props.color.hex)
+  const text = [props.color.name, props.color.hex, props.color.reading].filter(Boolean).join(' ')
+  navigator.clipboard?.writeText(text)
 }
 function onEnter() {
   open.value = true
