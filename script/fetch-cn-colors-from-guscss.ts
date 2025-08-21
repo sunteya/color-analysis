@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import fs from 'fs/promises'
 import path from 'path'
-import { hexToRgb, rgbToHsl } from '../src/lib/utils'
+import { hex2oklch } from 'colorizr'
 import YAML from 'yaml'
 import { execFile } from 'child_process'
 import { promisify } from 'util'
@@ -61,14 +61,13 @@ async function main() {
 
   const yaml = await fs.readFile(tmpFile, 'utf8')
   const colors = parseColorsFromYaml(yaml)
-  const withHsl = colors.map(c => {
-    const { r, g, b } = hexToRgb(c.hex)
-    const { h, s, l } = rgbToHsl(r, g, b)
-    return { ...c, hsl: [h, s, l] as [number, number, number] }
+  const withOklch = colors.map(c => {
+    const oklch = hex2oklch(c.hex)
+    return { ...c, oklch: [oklch.l, oklch.c, oklch.h] as [number, number, number] }
   })
   const outFile = path.join(dataDir, '中国传统色.json')
-  await fs.writeFile(outFile, JSON.stringify(withHsl, null, 2) + '\n', 'utf8')
-  console.log(`Parsed ${withHsl.length} colors -> ${path.relative(cwd, outFile)}`)
+  await fs.writeFile(outFile, JSON.stringify(withOklch, null, 2) + '\n', 'utf8')
+  console.log(`Parsed ${withOklch.length} colors -> ${path.relative(cwd, outFile)}`)
 }
 
 main().catch((err) => {

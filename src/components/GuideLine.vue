@@ -56,14 +56,14 @@ onBeforeUnmount(() => window.removeEventListener('pointermove', onMove))
       :style="{ top: `calc(${100 - modelValue}% )` }"
       @pointerdown="onDown"
     >
-      <div class="absolute inset-0 rounded bg-white border border-gray-300 shadow-sm"></div>
+      <div class="absolute inset-0 rounded bg-base-100 border border-base-300 shadow-sm"></div>
     </div>
     <div
       class="absolute -right-4 w-3 h-3 -translate-y-1/2 cursor-row-resize select-none pointer-events-auto z-10"
       :style="{ top: `calc(${100 - modelValue}% )` }"
       @pointerdown="onDown"
     >
-      <div class="absolute inset-0 rounded bg-white border border-gray-300 shadow-sm"></div>
+      <div class="absolute inset-0 rounded bg-base-100 border border-base-300 shadow-sm"></div>
     </div>
   </div>
   

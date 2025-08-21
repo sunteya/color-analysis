@@ -1,11 +1,11 @@
 /// <reference types="node" />
 import fs from 'fs/promises'
 import path from 'path'
-import { hexToRgb, rgbToHsl } from '../src/lib/utils'
+import { hex2oklch } from 'colorizr'
 
-const URL_Y = 'https://www.colordic.org/y'
+const URL_W = 'https://www.colordic.org/w'
 
-type YoColor = {
+type WaColor = {
   name: string
   reading: string
   hex: string
@@ -32,12 +32,12 @@ async function downloadIfNeeded(url: string, destFile: string) {
   await fs.writeFile(destFile, html, 'utf8')
 }
 
-function parseColorsFromHtml(html: string): YoColor[] {
+function parseColorsFromHtml(html: string): WaColor[] {
   const anchorRe = /<a[^>]*>([\s\S]*?)<\/a>/g
   const attrsRe = /<a([^>]*)>/
   const hrefHasSample = /href=\"[^\"]*\/colorsample\/[0-9]+\"/
   const titleAttr = /title=\"([^\"]*?)\"/
-  const results: Map<string, YoColor> = new Map()
+  const results: Map<string, WaColor> = new Map()
 
   for (let m: RegExpExecArray | null; (m = anchorRe.exec(html)); ) {
     const aTag = m[0]
@@ -51,7 +51,7 @@ function parseColorsFromHtml(html: string): YoColor[] {
     const tm = title.match(/^\s*(.*?)\s+(.+?)\s+(#[0-9a-fA-F]{6})\s*$/)
     if (!tm) continue
     const hex = tm[3].toLowerCase()
-    if (!results.has(hex)) results.set(hex, { name: tm[2], reading: tm[1], hex })
+    if (!results.has(hex)) results.set(hex, { name: tm[1], reading: tm[2], hex })
   }
 
   return Array.from(results.values())
@@ -64,25 +64,23 @@ async function main() {
   await ensureDir(tmpDir)
   await ensureDir(dataDir)
 
-  const tmpFile = path.join(tmpDir, 'colordic-y.html')
-  await downloadIfNeeded(URL_Y, tmpFile)
+  const tmpFile = path.join(tmpDir, 'colordic-w.html')
+  await downloadIfNeeded(URL_W, tmpFile)
 
   const html = await fs.readFile(tmpFile, 'utf8')
   const colors = parseColorsFromHtml(html)
-  const withHsl = colors.map(c => {
-    const { r, g, b } = hexToRgb(c.hex)
-    const { h, s, l } = rgbToHsl(r, g, b)
-    return { ...c, hsl: [h, s, l] as [number, number, number] }
+  const withOklch = colors.map(c => {
+    const oklch = hex2oklch(c.hex)
+    return { ...c, oklch: [oklch.l, oklch.c, oklch.h] as [number, number, number] }
   })
-  const outFile = path.join(dataDir, '洋色大辞典.json')
-  await fs.writeFile(outFile, JSON.stringify(withHsl, null, 2) + '\n', 'utf8')
-  console.log(`Parsed ${withHsl.length} colors -> ${path.relative(cwd, outFile)}`)
+  const outFile = path.join(dataDir, '和色大辞典.json')
+  await fs.writeFile(outFile, JSON.stringify(withOklch, null, 2) + '\n', 'utf8')
+  console.log(`Parsed ${withOklch.length} colors -> ${path.relative(cwd, outFile)}`)
 }
 
 main().catch((err) => {
   console.error(err)
   process.exitCode = 1
 })
-
 
 

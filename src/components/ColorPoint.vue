@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useFloating, autoUpdate, offset, flip, shift } from '@floating-ui/vue'
 interface RawColor {
   name: string
@@ -25,6 +25,9 @@ const { x, y, strategy } = useFloating(referenceRef, floatingRef, {
   middleware: [offset(8), flip(), shift()]
 })
 
+const size = computed(() => 6)
+const half = computed(() => size.value / 2)
+
 function onClick() {
   const text = [props.color.name, props.color.hex, props.color.reading].filter(Boolean).join(' ')
   navigator.clipboard?.writeText(text)
@@ -40,12 +43,12 @@ function onLeave() {
 </script>
 
 <template>
-  <div class="absolute" :style="{ left: `calc(${props.x}% - 3px)`, bottom: `calc(${props.y}% - 3px)` }">
+  <div class="absolute" :style="{ left: `calc(${props.x}% - ${half}px)`, bottom: `calc(${props.y}% - ${half}px)` }">
     <div
       ref="referenceRef"
       class="rounded-full cursor-pointer"
-      :class="(open || props.highlight) ? 'ring-2 ring-black/40' : 'ring-1 ring-black/10'"
-      :style="{ width: '6px', height: '6px', backgroundColor: props.color.hex }"
+      :class="(open || props.highlight) ? 'ring-2 ring-black/50' : 'ring-1 ring-black/10'"
+      :style="{ width: `${size}px`, height: `${size}px`, backgroundColor: props.color.hex }"
       @mouseenter="onEnter"
       @mouseleave="onLeave"
       @click="onClick"
@@ -53,7 +56,7 @@ function onLeave() {
     <div
       v-if="open"
       ref="floatingRef"
-      class="z-50 px-2 py-1 text-sm rounded bg-black/80 text-white shadow select-none"
+      class="z-50 px-2 py-1 text-sm rounded-box bg-base-200 text-base-content shadow select-none"
       :style="{ position: strategy, left: `${x ?? 0}px`, top: `${y ?? 0}px` }"
     >
       <div class="flex items-center gap-2">
